@@ -1,3 +1,4 @@
+import os
 import re
 import logging
 from mypy import api as mypy_api
@@ -72,7 +73,14 @@ def pyls_lint(config, workspace, document, is_saved):
     if settings.get('strict', False):
         args.append('--strict')
 
-    report, errors, _ = mypy_api.run(args)
+    try:
+        old_wd = os.getcwd()
+        print(config)
+        os.chdir(config._root_path)
+        report, errors, _ = mypy_api.run(args)
+    finally:
+        os.chdir(old_wd)
+
 
     diagnostics = []
     for line in report.splitlines():
